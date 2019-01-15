@@ -1,19 +1,18 @@
 package main
 
 type Worker struct {
-	WorkerQueue chan chan Job
-	Jobchan     chan Job
+	JobQueue chan Job
 }
 
-func NewWorker(wc chan chan Job) Worker {
-	return Worker{WorkerQueue: wc, Jobchan: make(chan Job)}
+func NewWorker() Worker {
+	return Worker{JobQueue: make(chan Job)}
 }
-func (w Worker) Run() {
+func (w Worker) Run(wq chan chan Job) {
 	go func() {
 		for {
-			w.WorkerQueue <- w.Jobchan
+			wq <- w.JobQueue
 			select {
-			case job := <-w.Jobchan:
+			case job := <-w.JobQueue:
 				job.Do()
 			}
 		}

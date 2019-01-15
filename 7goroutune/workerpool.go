@@ -6,7 +6,6 @@ type WorkerPool struct {
 	workerlen   int
 	JobQueue    chan Job
 	WorkerQueue chan chan Job
-	// Worker     []*Worker
 }
 
 func NewWorkerPool(workerlen int) *WorkerPool {
@@ -20,9 +19,8 @@ func (wp *WorkerPool) Run() {
 	fmt.Println("初始化worker")
 	//初始化worker
 	for i := 0; i < wp.workerlen; i++ {
-		worker := NewWorker(wp.WorkerQueue)
-		// wp.Worker = append(wp.Worker, &worker)
-		worker.Run()
+		worker := NewWorker()
+		worker.Run(wp.WorkerQueue)
 	}
 	// 循环获取可用的worker,往worker中写job
 	go func() {
