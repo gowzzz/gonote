@@ -11,7 +11,7 @@ type WorkerPool struct {
 func NewWorkerPool(workerlen int) *WorkerPool {
 	return &WorkerPool{
 		workerlen:   workerlen,
-		JobQueue:    make(chan Job),
+		JobQueue:    make(chan Job, workerlen),
 		WorkerQueue: make(chan chan Job, workerlen),
 	}
 }
