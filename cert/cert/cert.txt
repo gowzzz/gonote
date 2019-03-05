@@ -1,0 +1,54 @@
+创建服务器私钥，命令会让你输入一个口令：
+openssl genrsa -des3 -out server.key 1024
+
+创建签名请求的证书（CSR）
+openssl req -new -x509 -key server.key -out server.crt -days 365
+
+openssl生成的私钥中包含了公钥的信息，我们可以根据私钥生成公钥：
+openssl rsa -in server.key -out server.key.public
+
+我们也可以根据私钥直接生成自签发的数字证书：
+openssl req -new -x509 -key server.key -out server.crt -days 365
+-----------------------------------------------------------------------
+
+生成CA自己的私钥 rootCA.key
+openssl genrsa -out ca.key 2048
+
+根据CA自己的私钥生成自签发的数字证书，该证书里包含CA自己的公钥。 rootCA.pem
+openssl req -x509 -new -nodes -key ca.key -subj "/CN=tonybai.com" -days 5000 -out ca.crt
+
+服务端的私钥和数字证书（由自CA签发）
+生成服务端私钥
+openssl genrsa -out server.key 2048
+
+生成Certificate Sign Request，CSR，证书签名请求。
+openssl req -new -key server.key -subj "/CN=localhost" -out server.csr
+
+自CA用自己的CA私钥对服务端提交的csr进行签名处理，得到服务端的数字证书device.crt
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 5000
+
+CA:
+私钥文件 ca.key
+数字证书 ca.crt
+
+Server:
+私钥文件 server.key
+数字证书 server.crt
+
+
+
+要对客户端数字证书进行校验，首先客户端需要先有自己的证书。我们以上面的例子为基础，生成客户端的私钥与证书。
+openssl genrsa -out client.key 2048
+openssl req -new -key client.key -subj "/CN=tonybai_cn" -out client.csr
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 5000
+
+--------当出现cli报错时，有可能是证书中的ExtKeyUsage信息需要包含clientAuth
+1、创建文件client.ext
+内容：
+extendedKeyUsage=clientAuth
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extfile client.ext -out client.crt -days 5000
+
+
+
+https://www.cnblogs.com/pzblog/p/9088286.html
+

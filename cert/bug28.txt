@@ -1,0 +1,52 @@
+    baseip: 0.0.0.0
+    port: 9005
+    nsqdtcpaddr: nsqd:4150
+    xgfaceaddr: xgface:50000
+    xgindexaddr: xgindex_2:50002   #staff用50002 alarm用50002
+    staffaddr: StaffRepository:9003
+    warningsaddr: AlarmSystem:9005
+
+云服务器ip 
+120.92.123.3
+
+mysql    admin  1qaz2WSX
+内网IP端口 ：10.0.1.19:3306   
+外网IP端口：120.131.10.122:20392
+
+redis 只支持内网访问: ip端口 ： 10.0.1.17:6379
+
+http跳转https：
+listen 80 default_server;
+server_name xxx;
+return 301 https://$server_name$request_uri;
+
+server{
+listen 443 ssl http2 default_server;
+listen [::]:443 http2 default_server;
+xx.crt
+xx.key
+}
+
+================
+/usr/local/openresty/nginx/sbin/nginx -V
+--with-http_ssl_module
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
