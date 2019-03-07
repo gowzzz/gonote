@@ -35,7 +35,18 @@ func pase_student() {
 		println(k, "=>", v.Name)
 	}
 }
+func test(a []int) {
+	fmt.Println(a)
+	a[1] = 99
+	a = []int{4, 5, 6, 7}
+	fmt.Println(a)
+}
 func main() {
+	a := []int{1, 2, 3}
+	test(a)
+	fmt.Println("main:", a)
+
+	return
 	l := new([]int)
 	*l = append(*l, 1)
 	fmt.Println(*l)
