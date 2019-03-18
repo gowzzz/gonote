@@ -8,7 +8,6 @@ func main() {
 img:
 listimgs
 addimg
-delimg
 delimgs
 checksimilr_of_feature
 
@@ -16,7 +15,6 @@ lib组合people
 listlibs
 addlib
 editlib
-dellib
 dellibs
 
 people 组合img lib
