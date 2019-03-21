@@ -1,0 +1,27 @@
+
+错误及其原因：Invalid Request Definition size: expected 3 got 4 rvals: [alice gy data1 read]
+r = sub, dom, obj, act 写成了r = sub,dom, obj, act  ---少了个空格
+---------------------------------------
+与 policy 不同，model 只能加载，不能保存。 因为我们认为 model 不是动态组件，不应该在运行时进行修改，所以我们没有实现一个 API 来将 model 保存到存储中。
+---------------------------------------
+
+
+
+正常RBAC
+g = _, _
+g, alice, data2_admin
+说明 alice具有data2_admin的角色
+m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+
+
+多租户的RBAC
+g = _, _, _
+
+p, admin, tenant1, data1, read
+p, admin, tenant2, data2, read
+g, alice, admin, tenant1
+g, alice, user, tenant2
+matcher原语：
+m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && r.act == p.act
+
+alice在域tenant1中具有admin的角色 ，在域tenant2中只具有user的角色，因为user没有权限，那么alice也没有权限

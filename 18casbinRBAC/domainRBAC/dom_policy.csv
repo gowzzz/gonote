@@ -1,0 +1,8 @@
+p, admin, gy, data1, read
+p, admin, gy, data1, write
+p, zhuangjia, jn, data2, read
+p, zhuangjia, jn, data2, write
+p, zhuangjia, jn, data1, read
+g, alice, admin, gy
+g, alice, zhuangjia, jn
+g, alice, admin, jn
