@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"reflect"
 	"runtime"
+	"time"
 )
 
 /*
@@ -100,9 +101,54 @@ func main() {
 	}
 	mux.HandleFunc("/hello1", http.HandlerFunc(log(hello1)))
 	mux.HandleFunc("/hello2", http.HandlerFunc(hello2))
-
+	// mux.Handle("/a", t2(timeMiddleware(http.HandlerFunc(hello2))))
+	r := NewRouter()
+	r.Add(t2)
+	r.Add(timeMiddleware)
+	h2 := r.Use(http.HandlerFunc(hello2))
+	mux.Handle("/a", h2)
 	server.ListenAndServe()
 
+}
+
+type middleware func(http.Handler) http.Handler
+
+type Router struct {
+	middlewareChain []func(http.Handler) http.Handler
+	mux             map[string]http.Handler
+}
+
+func NewRouter() *Router {
+	return &Router{}
+}
+
+func (r *Router) Add(m middleware) {
+	r.middlewareChain = append(r.middlewareChain, m)
+}
+func (r *Router) Use(h http.Handler) http.Handler {
+	var res = h
+	for i := len(r.middlewareChain) - 1; i >= 0; i-- {
+		res = r.middlewareChain[i](res)
+	}
+	return res
+}
+
+func t2(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		name := runtime.FuncForPC(reflect.ValueOf(next).Pointer()).Name()
+		fmt.Println("Handler function called -:" + name)
+		next.ServeHTTP(w, r) //执行调用
+	})
+}
+func timeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			// http.Error(w, http.StatusText(403), 403)
+			tStart := time.Now()
+			next.ServeHTTP(w, r)
+			tEnd := time.Since(tStart)
+			fmt.Println("timeMiddleware:", tEnd)
+		})
 }
 
 // 中间件
