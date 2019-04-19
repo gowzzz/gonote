@@ -1,0 +1,34 @@
+如果从Protobuf的角度看，GRPC只不过是一个针对service接口生成代码的生成器。
+安装
+需要的库包括grpc-go, golang/net, golang/text, protobuf/proto, protobuf/protoc-gen-go, google/go-genproto
+
+//下载protoc工具
+//https://github.com/protocolbuffers/protobuf/releases
+下载指定版本到bin目录下即可
+
+# 如果已经安装了proto和protoc-gen-go的话就不用安装了
+go get -u github.com/golang/protobuf/{proto,protoc-gen-go}
+
+//WINDOW使用 %GOPATH%或者使用git命令行
+# 下载grpc-go
+git clone https://github.com/grpc/grpc-go.git $GOPATH/src/google.golang.org/grpc
+
+# 下载golang/net
+git clone https://github.com/golang/net.git $GOPATH/src/golang.org/x/net
+
+# 下载golang/text
+git clone https://github.com/golang/text.git $GOPATH/src/golang.org/x/text
+
+# 下载go-genproto
+git clone https://github.com/google/go-genproto.git $GOPATH/src/google.golang.org/genproto
+
+
+# 安装
+cd $GOPATH/src/
+go install google.golang.org/grpc
+
+我们就用官网提供的helloworld example试下$GOPATH/src/google.golang.org/grpc/examples/helloworld
+protoc -I. --go_out=plugins=grpc:. helloworld.proto
+
+使用protoc-gen-go内置的grpc插件生成GRPC代码：
+$ protoc --go_out=plugins=grpc:. helloworld.proto
