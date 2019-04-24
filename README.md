@@ -25,7 +25,7 @@ github.com/gogo/protobuf			2600	gogoprotobuf是golang/protobuf的一个分支，
 github.com/BurntSushi/toml			2559	这个Go包提供了一个反射接口，类似于Go的标准库json和xml包。这个包还支持编码。
 github.com/rcrowley/go-metrics		2310	Go port of Coda Hale's Metrics library
 github.com/coreos/bbolt				2000 一个用于Go的嵌入式键/值数据库。
-
+ 
 
 //gopkg.in/natefinch/lumberjack.v2 	1246	提供了一个滚动日志记录器。
 github.com/go-ego/gse				990	Go 语言高效分词, 支持英文、中文、日文等
