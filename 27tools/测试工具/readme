@@ -1,1 +1,80 @@
 https://github.com/stretchr/testify
+assert package
+require package
+他们的唯一差别就是require的函数会直接导致case结束，而assert虽然也标记为case失败，但case不会退出，而是继续往下执行
+
+https://github.com/Pallinder/go-randomdata  这个库可以生成一些随机的假数据，就是测试里常说faker
+
+assert包assert提供了一组用于普通Go测试系统的全面测试工具。
+http包http不赞成使用net/http/httptest
+mock包mock提供了一个系统，通过该系统可以模拟对象并验证调用是否按预期进行。
+require包实现与“断言”包相同的断言，但是当测试失败时，它会停止测试执行。
+suite package suite包含用于创建测试套件结构并将这些结构上的方法作为测试运行的逻辑。
+供应商/github.com/davecgh/go-spew/spew package spew实现了一个用于Go数据结构的漂亮的深层打印机，以帮助调试。
+difflib包是Python difflib模块的一个部分端口。
+
+--------------------------------
+func TestBuildFaceURL(t *testing.T) {
+	face := BuildFaceURL("/bfs/facepri/4a259f715b63157f24f76521231480438058436e.jpg")
+	u, err := url.Parse(face)
+	assert.Nil(t, err)
+	assert.NotNil(t, u.Query().Get("token"))
+}
+
+assert.Contains(t, names.Names, int64(3))
+assert.NotContains(t, reply.Names, int64(3))
+assert.True(t, tr.finished)
+assert.IsType(t, m, st.Details()[0])
+assert.Len(t, st.Details(), 0)
+
+assert.Contains(t, fnams, "info.log."+time.Now().Format("2006-01-02")+".006")
+assert.Error(t, Form.Bind(req, q))
+assert.EqualValues(t, []int8{1, 2}, q.State)
+assert.NoError(t, Form.Bind(req, q))
+assert.NoError(t, validate(nu))
+assert.Empty(t, res.Data)
+
+assert.False(t, len(bs) <= 0)
+assert.InDelta(t, float64(time.Second*2), float64(time.Since(start)), float64(time.Second))	
+assert.IsType(t, &pb.Error{}, details[0])
+assert.IsType(t, err.Proto(), details[1])	
+
+----------------------------------
+
+
+
+func Equal(t TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
+func NotEqual(t TestingT, expected, actual interface{}, msgAndArgs ...interface{}) bool
+
+func Nil(t TestingT, object interface{}, msgAndArgs ...interface{}) bool
+func NotNil(t TestingT, object interface{}, msgAndArgs ...interface{}) bool
+
+func Empty(t TestingT, object interface{}, msgAndArgs ...interface{}) bool
+func NotEmpty(t TestingT, object interface{}, msgAndArgs ...interface{}) bool
+
+func NoError(t TestingT, err error, msgAndArgs ...interface{}) bool
+func Error(t TestingT, err error, msgAndArgs ...interface{}) bool
+
+func Zero(t TestingT, i interface{}, msgAndArgs ...interface{}) bool
+func NotZero(t TestingT, i interface{}, msgAndArgs ...interface{}) bool
+
+func True(t TestingT, value bool, msgAndArgs ...interface{}) bool
+func False(t TestingT, value bool, msgAndArgs ...interface{}) bool
+
+func Len(t TestingT, object interface{}, length int, msgAndArgs ...interface{}) bool
+
+func NotContains(t TestingT, s, contains interface{}, msgAndArgs ...interface{}) bool
+func NotContains(t TestingT, s, contains interface{}, msgAndArgs ...interface{}) bool
+func Subset(t TestingT, list, subset interface{}, msgAndArgs ...interface{}) (ok bool)
+func NotSubset(t TestingT, list, subset interface{}, msgAndArgs ...interface{}) (ok bool)
+
+func FileExists(t TestingT, path string, msgAndArgs ...interface{}) bool
+func DirExists(t TestingT, path string, msgAndArgs ...interface{}) bool
+
+
+
+
+
+
+
+
