@@ -4,7 +4,12 @@ require package
 他们的唯一差别就是require的函数会直接导致case结束，而assert虽然也标记为case失败，但case不会退出，而是继续往下执行
 
 https://github.com/Pallinder/go-randomdata  这个库可以生成一些随机的假数据，就是测试里常说faker
+---------------------------------------
 
+
+
+
+------------------------------------
 assert包assert提供了一组用于普通Go测试系统的全面测试工具。
 http包http不赞成使用net/http/httptest
 mock包mock提供了一个系统，通过该系统可以模拟对象并验证调用是否按预期进行。

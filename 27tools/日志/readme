@@ -1,0 +1,33 @@
+logrus是一个可插拔的、结构化的日志框架。
+logrus拥有六种日志级别：debug、info、warn、error、fatal和panic
+可扩展的Hook机制：
+	允许使用者通过hook的方式将日志分发到任意地方，如本地文件系统、标准输出、logstash、elasticsearch或者mq等，或者通过hook定义日志内容和格式等。
+logrus内置了两种日志格式，JSONFormatter和TextFormatter，如果这两个格式不满足需求，可以自己动手实现接口Formatter，来定义自己的日志格式。
+logrus鼓励通过Field机制进行精细化的、结构化的日志记录，而不是通过冗长的消息来记录日志。
+
+log.SetFormatter(&log.JSONFormatter{})   JSON在生产中通常只在使用Splunk或Logstash等工具进行日志聚合时才有用。
+
+logrus的GitHub地址    https://github.com/sirupsen/logrus
+lfshook的GitHub地址    https://github.com/rifflock/lfshook
+file-rotatelogs的GitHub地址   https://github.com/lestrrat-go/file-rotatelogs
+pkg/errors的GitHub地址    https://github.com/pkg/errors   
+
+日志旋转不提供Logrus。日志旋转应该由外部程序(如logrotate(8))完成，该程序可以压缩和删除旧的日志条目。它不应该是应用程序级日志程序的特性。
+
+file-rotatelogs进行日志本地文件分割。
+
+Fatal处理
+和很多日志框架一样，logrus的Fatal系列函数会执行os.Exit(1)。但是，logrus提供“可以注册一个或多个fatal handler函数”的接口logrus.RegisterExitHandler(handler func(){})，让logrus在执行os.Exit(1)之前进行相应的处理。fatal handler可以在系统异常时调用一些资源释放api等，让应用正确地关闭。
+
+线程安全
+默认情况下，logrus的api都是线程安全的，其内部通过互斥锁来保护并发写。互斥锁工作于调用hooks或者写日志的时候。如果不需要锁，可以调用logger.SetNoLock()来关闭之。可以关闭logrus互斥锁的情形包括：
+
+没有设置hook，或者所有的hook都是线程安全的实现。
+写日志到logger.Out已经是线程安全的了。例如，logger.Out已经被锁保护，或者写文件时，文件是以O_APPEND方式打开的，并且每次写操作都小于4k。
+
+
+
+文件旋转之间的间隔。默认情况下，日志每86400秒旋转一次。注意:记住要利用时间。持续时间值。
+是时候等到旧的日志被清除了。默认情况下不清除日志，这当然不是您想要的。注意:记住要利用时间。持续时间值。
+应该保留文件的数量。默认情况下，此选项是禁用的。
+注意:MaxAge应该通过显式指定 rotatelogs.WithMaxAge(-1), /来禁用。
