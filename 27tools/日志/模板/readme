@@ -1,0 +1,29 @@
+Go 标准库也通过 text/template html/template 这两个库为模板提供了强有力 支持 并且毫不意外地很多 Go 框架都使用了这两个库作为默认的板引擎
+无逻辑模板引擎（ logic-less template engine ）：完全分离程序表现和逻辑
+
+嵌入逻辑的模板引擎（ embedded logic template engine )：会使代码逻辑分散到不同的处理器中，导致代码维护复杂
+    如php，但后来PHP发展成了一种语言
+
+go大部分模板引擎相关的功能放在了text/template，小部分与html相关的功能放在了 html/template
+
+介于两种模板引擎之间
+
+w.Header().Set("X-XSS-Protection","0") 关闭go模板的xss防御
+
+
+如果你没有使用前端包管理工具，而是通过其他途径获取的源码包，
+你会发现源码包已经包含了一个 bower_components 目录，你至少要把 dist、plugins 和 bower_components 这三个目录复制到项目的运行目录中。
+
+主标题： main-header
+左侧标题： main-sidebar
+
+内容填充： content-wrapper
+    内容填充标题：content-header 
+    内容填充内容： content
+
+底脚：main-footer
+右侧工具栏：    control-sidebar control-sidebar-dark control-sidebar-open
+    右侧工具栏背景：control-sidebar-bg
+
+用户下拉菜单：dropdown-menu
+

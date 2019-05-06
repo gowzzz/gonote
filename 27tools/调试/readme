@@ -1,0 +1,3 @@
+go get -v -u github.com/go-delve/delve/cmd/dlv
+
+https://github.com/go-delve/delve/blob/master/Documentation/cli/getting_started.md
