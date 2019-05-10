@@ -22,9 +22,20 @@ e.RemovePolicy(...)
 
 // 开启AutoSave机制
 e.EnableAutoSave(true)
-
+ 
 */
-func main() {
+func main(){
+	sub := "alice" // the user that wants to access a resource.
+	obj := "/alice_data/a" // the resource that is going to be accessed.
+	act := "123"  // the operation that the user performs on the resource.
+	e := casbin.NewEnforcer("./rest_model.conf", "./rest_policy.csv")
+	if e.Enforce(sub, obj, act) == true {
+		fmt.Println("ok")
+	} else {
+		fmt.Println("deny")
+	}
+}
+func aaa() {
 	sub := "alice" // the user that wants to access a resource.
 	obj := "data2" // the resource that is going to be accessed.
 	act := "read"  // the operation that the user performs on the resource.

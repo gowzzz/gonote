@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"strings"
+	// "strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -12,9 +12,9 @@ import (
 var SecretKey = "aaa"
 
 func main() {
-	a := strings.Split("http://10.58.122.238/cameraimages/staff/staff_1554708362966589889.jpeg", "/")
-	fmt.Println(a[len(a)-1])
-	return
+	// a := strings.Split("http://10.58.122.238/cameraimages/staff/staff_1554708362966589889.jpeg", "/")
+	// fmt.Println(a[len(a)-1])
+	// return
 
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)

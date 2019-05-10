@@ -1,0 +1,2 @@
+p,alice,/alice_data/*,
+p,cathy,/cathy_data,(GET)|(POST)

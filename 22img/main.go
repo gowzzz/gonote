@@ -6,11 +6,32 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	_ "image/gif"
+    _ "image/jpeg"
+	_ "image/png"
+	"image"
 )
 
 var filePth = "./2.jpg"
+func main(){
+	f, err := os.Open(filePth)
+	if err != nil {
+		fmt.Println("err1:", err)
+		return
+	}
+	defer f.Close()
+	// c, s1, err := image.DecodeConfig(f)
+	// fmt.Printf("%+v\n",c)
+	// fmt.Println("s1 = ", s1)
+	// fmt.Println("width = ", c.Width)
+	// fmt.Println("height = ", c.Height)
 
-func main() {
+	img, s2, err := image.Decode(f)
+	fmt.Printf("%+v\n",img.ColorModel())
+	fmt.Printf("%+v\n",img.Bounds())
+	fmt.Println("s2 = ", s2)
+}
+func main2() {
 	f, err := os.Open(filePth)
 	if err != nil {
 		fmt.Println("err1:", err)
