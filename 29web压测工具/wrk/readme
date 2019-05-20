@@ -1,0 +1,146 @@
+https://www.cnblogs.com/yanyx/p/6709090.html
+https://www.jianshu.com/p/43d04d8baaf7
+
+TPS  即Transactions Per Second的缩写，每秒处理的事务数目。一个事务是指一个客户机向服务器发送请求然后服务器做出反应的过程。
+客户机在发送请求时开始计时，收到服务器响应后结束计时，以此来计算使用的时间和完成的事务个数，最终利用这些信息作出的评估分。
+QPS  即Queries Per Second的缩写，每秒能处理查询数目。是一台服务器每秒能够相应的查询次数，是对一个特定的查询服务器在规定时间内所处理流量多少的衡量标准。
+RPS   即Requests Per Second的缩写，每秒能处理的请求数目。等效于QPS
+
+https://github.com/wg/wrk   2w star    c语言
+
+wrk -t8 -c200 -d30s -s ./test.lua --latency  "http://www.bing.com"
+一般线程不宜过多，核数的2到4倍就够了
+
+使用Lua脚本个性化wrk压测
+wrk支持在三个阶段对压测进行个性化，分别是启动阶段、运行阶段和结束阶段。每个测试线程，都拥有独立的Lua运行环境。
+启动阶段
+function setup(thread)  wrk就会在测试线程已经初始化但还没有启动的时候调用该方法。
+运行阶段
+function init(args) 由测试线程调用，只会在进入运行阶段时，调用一次。支持从启动wrk的命令中，获取命令行参数；
+function delay()    在每次发送request之前调用，如果需要delay，那么delay相应时间；
+function request()  用来生成请求；每一次请求都会调用该方法，所以注意不要在该方法中做耗时的操作；
+function response(status, headers, body)    在每次收到一个响应时调用；为提升性能，如果没有定义该方法，那么wrk不会解析headers和body；
+结束阶段
+function done(summary, latency, requests)   该方法在整个测试过程中只会调用一次，可从参数给定的对象中，获取压测结果，生成定制化的测试报告。
+
+自定义脚本中可访问的变量和方法
+ 变量： wrk    (一个table类型的变量wrk，是全局变量，修改该table，会影响所有请求。) 
+ wrk = {
+    scheme  = "http",
+    host    = "localhost",
+    port    = nil,
+    method  = "GET",
+    path    = "/",
+    headers = {},
+    body    = nil,
+    thread  = <userdata>,
+ }
+可调用的wrk方法：wrk.fomat wrk.lookup wrk.connect
+function wrk.format(method, path, headers, body)    根据参数和全局变量wrk，生成一个HTTP rquest string。
+function wrk.lookup(host, service)  给定host和service（port/well known service name），返回所有可用的服务器地址信息。
+function wrk.connect(addr)  测试与给定的服务器地址信息是否可以成功创建连接
+
+
+
+
+
+使用方法: wrk <选项> <被测HTTP服务的URL>                            
+  Options:                                            
+    -c, --connections <N>  跟服务器建立并保持的TCP连接数量  
+    -d, --duration    <T>  压测时间           
+    -t, --threads     <N>  使用多少个线程进行压测   
+                                                      
+    -s, --script      <S>  指定Lua脚本路径       
+    -H, --header      <H>  为每一个HTTP请求添加HTTP头      
+        --latency          在压测结束后，打印延迟统计信息   
+        --timeout     <T>  超时时间     
+    -v, --version          打印正在使用的wrk的详细版本信息
+                                                      
+  <N>代表数字参数，支持国际单位 (1k, 1M, 1G)
+  <T>代表时间参数，支持时间单位 (2s, 2m, 2h)
+
+例子：
+wrk -t8 -c200 -d30s --latency  "http://www.bing.com"
+
+
+Running 30s test @ http://www.bing.com （压测时间30s）
+  8 threads and 200 connections （共8个测试线程，200个连接）
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+              （平均值） （标准差）（最大值）（正负一个标准差所占比例）
+    Latency    46.67ms  215.38ms   1.67s    95.59%
+    （延迟）
+    Req/Sec     7.91k     1.15k   10.26k    70.77%
+    （处理中的请求数）
+  Latency Distribution （延迟分布）
+     50%    2.93ms
+     75%    3.78ms
+     90%    4.73ms
+     99%    1.35s （99分位的延迟）
+  1790465 requests in 30.01s, 684.08MB read （30.01秒内共处理完成了1790465个请求，读取了684.08MB数据）
+Requests/sec:  59658.29 （平均每秒处理完成59658.29个请求）
+Transfer/sec:     22.79MB （平均每秒读取数据22.79MB）
+
+
+
+
+
+
+function done2(summary, latency, requests)
+   print("summary:%s",summary)
+   print("latency:%s",latency)
+   print("requests:%s",requests)
+
+   for key,value in pairs(latency) do
+      print("key: " .. tostring(key) .. ", value: " .. tostring(value))
+   end
+end
+
+
+
+  function done(summary, latency, requests)
+
+  The done() function receives a table containing result data, and two
+  statistics objects representing the per-request latency and per-thread
+  request rate. Duration and latency are microsecond values and rate is
+  measured in requests per second.
+
+  latency.min              -- minimum value seen
+  latency.max              -- maximum value seen
+  latency.mean             -- average value seen
+  latency.stdev            -- standard deviation
+  latency:percentile(99.0) -- 99th percentile value
+  latency(i)               -- raw value and count
+
+  summary = {
+    duration = N,  -- run duration in microseconds
+    requests = N,  -- total completed requests
+    bytes    = N,  -- total bytes received
+    errors   = {
+      connect = N, -- total socket connection errors
+      read    = N, -- total socket read errors
+      write   = N, -- total socket write errors
+      status  = N, -- total HTTP status codes > 399
+      timeout = N  -- total request timeouts
+    }
+  }
+
+  
+print("latency.min:%s",latency.min)
+print("latency.max:%s",latency.max)
+print("latency.mean:%s",latency.mean)
+print("latency.stdev:%s",latency.stdev)
+print("latency:percentile(99.0):%s",latency:percentile(99.0))
+print("requests.min:%s",requests.min)
+print("requests.max:%s",requests.max)
+print("requests.mean:%s",requests.mean)
+print("requests.stdev:%s",requests.stdev)
+print("requests:percentile(99.0):%s",requests:percentile(99.0))
+
+print("summary['duration']:%s",summary["duration"])
+print("summary['requests']:%s",summary["requests"])
+print("summary['bytes']:%s",summary["bytes"])
+print("summary['errors'].connect:%s",summary['errors'].connect])
+print("summary['errors'].read:%s",summary['errors'].read])
+print("summary['errors'].write:%s",summary['errors'].write])
+print("summary['errors'].status:%s",summary['errors'].status])
+print("summary['errors'].timeout:%s",summary['errors'].timeout])

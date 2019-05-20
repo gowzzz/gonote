@@ -3,13 +3,14 @@ package main
 import (
 	"errors"
 	"fmt"
+
 	// "strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
-var SecretKey = "aaa"
+var SecretKey = "ZTlM2HDqqqY~!@#"
 
 func main() {
 	// a := strings.Split("http://10.58.122.238/cameraimages/staff/staff_1554708362966589889.jpeg", "/")
@@ -19,8 +20,8 @@ func main() {
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
 	// 类型断言时 数字都是float64 字符串是string类型。
-	claims["exp"] = time.Now().Add(time.Hour * time.Duration(1)).Unix()
-	claims["iat"] = "time.Now().Unix()"
+	claims["exp"] = time.Now().Add(time.Hour * 7 * 24).Unix()
+	claims["iat"] = time.Now().Unix()
 	claims["aaa"] = 123
 	token.Claims = claims
 	tokenString, err := token.SignedString([]byte(SecretKey))

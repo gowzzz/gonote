@@ -1,0 +1,19 @@
+https://github.com/buger/goreplay
+
+
+流量重放工具
+启用跟踪响应 --output-http-track-response
+
+
+重放到终端
+sudo gor --input-raw :8000 --output-stdout
+
+
+重放到另一个服务
+gor file-server :8001
+sudo gor --input-raw :8181 --output-http="http://localhost:8001"
+
+
+存在文件中，然后再重放  但是文件是空的？？？
+sudo gor --input-raw :8181 --output-file=requests.gor
+gor --input-file requests.gor --output-http="http://localhost:8001"
