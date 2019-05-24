@@ -1,0 +1,3 @@
+go get -u github.com/tencentcloud/tencentcloud-sdk-go
+该工具提供了在线调用、签名验证、SDK 代码生成和快速检索接口等能力，能显著降低使用云 API 的难度，推荐使用。
+https://console.cloud.tencent.com/api/explorer?Product=iai&Version=2018-03-01&Action=DetectFace
