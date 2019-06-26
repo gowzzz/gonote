@@ -1,0 +1,64 @@
+
+<!-- https://github.com/mcollina/mosca/wiki/MQTT-over-Websockets -->
+<html>
+
+    <style type="text/css" rel="stylesheet">
+      h1, div, input {
+          width: 100%;
+          height: 20%;
+          padding: 20px;
+          margin: 20px;
+          /* border: 10px red solid; */
+          text-align: center;
+          font-size: 36px;
+      }
+  </style>
+
+
+	<h1>
+		{{ .title }}
+	</h1>
+	<input type="text" placeholder="请输入消息" id="msg" /><br><br>
+  <input type="button" value="发送消息" id="send" /><br><br><br><br>
+  <div id="remsg"></div>
+<script src="static/js/jquery.min.js"></script>
+<script>
+  $(function(){
+    var ws = new WebSocket("ws://118.89.137.31:9001/websocket");  
+    var time 
+  $("#send").click(function(){
+    var msg=$("#msg").val()
+    ws.send(msg)
+  })
+  //连接打开时触发 
+  ws.onopen = function(evt) { 
+    clearInterval(time); 
+     console.log("Connection open ...");  
+     $("#remsg").text("连接成功，可以发送消息！")
+     $("#remsg").css("text-align", "center");
+      // ws.send("Hello WebSockets!");  
+  };  
+  //接收到消息时触发  
+  ws.onmessage = function(evt) {  
+      console.log("Received Message: " + evt.data); 
+    $("#remsg").text("消息内容:  " + evt.data)
+
+  };  
+  //连接关闭时触发  
+  ws.onclose = function(evt) { 
+    
+     time = setInterval(function() {
+      window.location.reload()
+    }, 1000); 
+     //1s
+      console.log("Connection closed.");  
+     $("#remsg").text("连接关闭，无法发送消息！")
+  };  
+
+
+
+  })
+  
+  </script>
+  
+</html>

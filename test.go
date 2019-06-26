@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"math/rand"
+	"os"
 	"regexp"
+	"time"
 	"unicode/utf8"
 )
 
@@ -70,8 +74,51 @@ func IsPhoneNum(str string) bool {
 	}
 	return false
 }
+func GetRandomString(l int) string {
+	str := "0123456789abcdefghijklmnopqrstuvwxyz"
+	bytes := []byte(str)
+	result := []byte{}
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for i := 0; i < l; i++ {
+		result = append(result, bytes[r.Intn(len(bytes))])
+	}
+	return string(result)
+}
+
 func main() {
-	fmt.Println(IsPhoneNum("13521146683"))
+
+	//获取当前时间
+	t := time.Now() //2018-07-11 15:07:51.8858085 +0800 CST m=+0.004000001
+	fmt.Println(t.Year())
+	fmt.Println(t.Month())
+	fmt.Println(t.Day())
+	fmt.Println(t.Hour())
+	fmt.Println(t.Minute())
+	fmt.Println(t.Unix() % (60 * 60 * 24)) //1531293019
+	// fmt.Println(t.Second())    //1531293019
+	// // fmt.Println(t.Format("2006-01-02 15:04:05"))
+	t1 := time.Unix(t.Unix()-t.Unix()%(60*60*24), 0)
+	t2 := time.Unix(t.Unix()-int64(t.Second()), 0)
+	fmt.Println(t1.Format("2006-01-02 15:04:05"))
+	fmt.Println(t2.Format("2006-01-02 15:04:05"))
+	// fmt.Println(GetRandomString(5))
+	return
+	path := `G:\工作目录\homey2.2\aaa`
+	_, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			err = os.MkdirAll(path, 0777)
+			if err != nil {
+				log.Println("PathExists file err2:", err)
+			}
+		} else {
+			log.Println("PathExists file err:", err)
+		}
+	} else {
+		log.Println("okkkkkkkkkk")
+	}
+
+	// fmt.Println(IsPhoneNum("13521146683"))
 	return
 	var aaa = make(map[string]interface{})
 	// var bbb = make(map[string]string)

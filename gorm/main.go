@@ -1,15 +1,35 @@
 package main
 
 import (
-    "github.com/jinzhu/gorm"
-    _ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
-type User struct{
-	Id uint
-	Name string
+
+type User struct {
+	Id      uint
+	Name    string
 	Commons int
 }
+
 var gormdb *gorm.DB
+
+func main() {
+	if gormdb == nil {
+
+	} else {
+
+	}
+	db, err := gorm.Open("mysql", "root:123456@tcp(127.0.0.1)/wz?charset=utf8&parseTime=True&loc=Local")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	db = db.AutoMigrate(&User{})
+	if db.Error != nil {
+		panic(db.Error)
+	}
+}
 
 // func newGorm() *gorm.DB {
 // 	var err error
@@ -38,20 +58,3 @@ var gormdb *gorm.DB
 // }
 
 // func GetGormDB() {
-func main() {
-	if gormdb==nil{
-
-	}else{
-
-	}
-  db, err := gorm.Open("mysql", "root:123456@tcp(127.0.0.1)/wz?charset=utf8&parseTime=True&loc=Local")
-  if err!=nil{
-	  panic(err)
-  }
-  defer db.Close()
-
-  db=db.AutoMigrate(&User{})
-  if db.Error!=nil{
-	panic(db.Error)
-  }
-}

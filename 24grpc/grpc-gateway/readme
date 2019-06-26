@@ -1,0 +1,20 @@
+grpc-gateway
+是protoc的一个插件。它读取gRPC服务定义，并生成一个反向代理服务器，该服务器将RESTful JSON API转换为gRPC。此服务器是根据gRPC定义中的自定义选项生成的。
+安装：https://grpc-ecosystem.github.io/grpc-gateway/docs/usage.html
+
+先建一个yaml文件，然后生成protogo再生成gwgo
+//linux使用说明
+protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. ./helloworld.proto
+protoc -I/usr/local/include -I. -I$GOPATH/src -I$GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true,grpc_api_configuration=./helloworld.yaml:. ./helloworld.proto
+//windows使用说明
+protoc  -I. -IG:/gopath/src -IG:/gopath/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --go_out=plugins=grpc:. ./helloworld.proto
+protoc  -I.  -IG:/gopath/src -IG:/gopath//src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis --grpc-gateway_out=logtostderr=true,grpc_api_configuration=./helloworld.yaml:. ./helloworld.proto
+
+-------------------------------
+
+websocket 
+websocket 完全可以复用 gRPC 的双向流，参考项目：[grpc-websocket-proxy]( https://github.com/tmc/grpc-websocket-proxy)
+
+
+----------------
+gRPC Go中间件:拦截器、助手、实用程序。

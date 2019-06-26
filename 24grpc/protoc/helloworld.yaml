@@ -1,0 +1,9 @@
+type: google.api.Service
+config_version: 3
+
+http:
+  rules:
+#  image url定义
+  - selector: helloworld.Greeter.SayHello
+    post: /staffs/SayHello
+    body: "*"
