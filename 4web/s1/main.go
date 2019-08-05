@@ -15,10 +15,56 @@ net/http 标准库可以分为客户端和服务器两个部分，库中的结�
 	• Server 、 ServeMux 、 Handler/HandleFunc 、 ResponseWriter 、 Header 、 Request和 Cookie 则对服务器进行支持
 其中header、request、cookie两者都支持
 */
+
+type myHandler1 struct{}
+
+func (my *myHandler1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello  myHandler1  ")
+}
+func hello1(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello  111 ")
+}
+
+func middleware1(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// http.Error(w, http.StatusText(403), 403)
+		tStart := time.Now()
+		next.ServeHTTP(w, r)
+		tEnd := time.Since(tStart)
+		fmt.Println("middleware1:", tEnd)
+	})
+}
+
+// 中间件
+func middleware2(h http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		name := runtime.FuncForPC(reflect.ValueOf(h).Pointer()).Name()
+		fmt.Println("Handler function called -:" + name)
+		tStart := time.Now()
+		h(w, r) //执行调用
+		tEnd := time.Since(tStart)
+		fmt.Println("middleware2:", tEnd)
+	}
+}
+
 // DefaultServeMux
 func main() {
+
+	mux := http.NewServeMux()
+	server := http.Server{
+		Addr:    ":8888",
+		Handler: mux,
+	}
+	myh := myHandler1{}
+	var test http.HandlerFunc = hello1
+	mux.HandleFunc("/h1", middleware2(test)) //=>mux.Handle("/h2", http.HandlerFunc(hello1))
+	mux.Handle("/h2", middleware1(&myh))
+	// mux.Handle("/a", t2(timeMiddleware(http.HandlerFunc(hello2))))
+	if err := server.ListenAndServe(); err != nil {
+		panic(err)
+	}
 	// ---------------------1
-	// http.ListenAndServe("", nil)
+	// http.ListenAndServe(":8080", mux)
 
 	// ---------------2
 	// server := http.Server{
@@ -94,21 +140,16 @@ func main() {
 
 	// 诸如日志记录、安全检查和错误处理这样的操作通常被称为横切关注点
 	// type HandlerFunc func(ResponseWriter, *Request)  类型别名
-	mux := http.NewServeMux()
-	server := http.Server{
-		Addr:    ":8080",
-		Handler: mux,
-	}
-	mux.HandleFunc("/hello1", http.HandlerFunc(log(hello1)))
-	mux.HandleFunc("/hello2", http.HandlerFunc(hello2))
-	// mux.Handle("/a", t2(timeMiddleware(http.HandlerFunc(hello2))))
-	r := NewRouter()
-	r.Add(t2)
-	r.Add(timeMiddleware)
-	h2 := r.Use(http.HandlerFunc(hello2))
-	mux.Handle("/a", h2)
-	server.ListenAndServe()
 
+}
+func hello2(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello  2222 ")
+}
+
+type myHandler2 struct{}
+
+func (my *myHandler2) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello World 222222222222 ")
 }
 
 type middleware func(http.Handler) http.Handler
@@ -158,25 +199,6 @@ func log(h http.HandlerFunc) http.HandlerFunc {
 		fmt.Println("Handler function called -:" + name)
 		h(w, r) //执行调用
 	}
-}
-
-func hello1(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello  111 ")
-}
-func hello2(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello  2222 ")
-}
-
-type myHandler1 struct{}
-
-func (my *myHandler1) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World  111111 ")
-}
-
-type myHandler2 struct{}
-
-func (my *myHandler2) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello World 222222222222 ")
 }
 
 // 在 Go 语言中 ， 一个处理器就是一个拥有 ServeHTTP 方法的接口 两个参数：第一个参数是一个 ResponseWriter 接口，而第二个参数则是一个指向 Reques t 结构的指针 。

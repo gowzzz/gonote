@@ -1,4 +1,3 @@
-
 //go:generate protoc -I ../helloworld --go_out=plugins=grpc:../helloworld ../helloworld/helloworld.proto
 
 // Package main implements a server for Greeter service.
@@ -9,14 +8,14 @@ import (
 	"log"
 	"net"
 
-	"google.golang.org/grpc"
 	pb "github.com/gonote/24grpc/protoc"
+	"google.golang.org/grpc"
 )
 
 const (
-	port = ":50051"
+	port = "127.0.0.1:50052"
 )
- 
+
 // server is used to implement helloworld.GreeterServer.
 type server struct{}
 

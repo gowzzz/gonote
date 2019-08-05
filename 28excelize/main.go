@@ -8,11 +8,40 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"strconv"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
+	"github.com/gin-gonic/gin"
+	"github.com/gonote/28excelize/excel"
 )
+
+type Import struct {
+	Content string `form:"Content" json:"Content" xml:"Content"  binding:"required"`
+}
+
+func main() {
+	r := gin.Default()
+	v1 := r.Group("/v1")
+	{
+		v1.POST("/import", func(c *gin.Context) {
+			var imp Import
+			if err := c.ShouldBind(&imp); err != nil {
+				c.SecureJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+				return
+			} else {
+				excel.ReadExcelFromBase64(imp.Content)
+			}
+		})
+		v1.POST("/export", func(c *gin.Context) {
+			c.SecureJSON(http.StatusOK, "export")
+		})
+	}
+
+	// http.ListenAndServe(":8888", r)
+	r.Run(":8888") // listen and serve on 0.0.0.0:8080
+}
 
 var filename = "./Book1.xlsx"
 
@@ -75,11 +104,9 @@ func ImageZoom(width, height, imgWidth, ImgHeight float64) (wmultiple, hmultiple
 }
 
 // w 1920  h1080  dpi 72
-func main() {
+func main2() {
 
-
-
-	return 
+	return
 
 	sheet := "Sheet1"
 	startcol, endcol := "A", "C"

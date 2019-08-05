@@ -7,12 +7,12 @@ import (
 	"os"
 	"time"
 
-	"google.golang.org/grpc"
 	pb "github.com/gonote/24grpc/protoc"
+	"google.golang.org/grpc"
 )
 
 const (
-	address     = "localhost:50051"
+	address     = "127.0.0.1:8080"
 	defaultName = "world"
 )
 
