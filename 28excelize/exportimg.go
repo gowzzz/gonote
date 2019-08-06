@@ -26,6 +26,11 @@ import (
 )
 /*
 一定要先修改全部单元格的大小，在存入图片，否则会导致部分缩放的图片因为图片的拉伸而拉伸。
+
+if err := AddImgBase64ToExcel(f, sheetname, "C"+strconv.Itoa(rownum), width, height, data.ImgContent, ".jpg", dd.IdInfo.Name); err != nil {
+	fmt.Println("身份证核验照 1 err  :", err)
+}
+
 */ 
 func 
 // 该方法只读取Sheet1
