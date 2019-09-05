@@ -1,0 +1,2 @@
+{"level":"info","time":"2019-09-05T10:30:40.669+0800","caller":"G:/gopath/src/github.com/gonote/zap/main.go:43","msg":"log 初始化成功","serviceName":"spikeProxy"}
+{"level":"info","time":"2019-09-05T10:30:40.718+0800","caller":"G:/gopath/src/github.com/gonote/zap/main.go:45","msg":"无法获取网址","serviceName":"spikeProxy","url":"http://www.baidu.com","attempt":3,"backoff":1}

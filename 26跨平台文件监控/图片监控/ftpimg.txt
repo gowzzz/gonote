@@ -1,0 +1,23 @@
+第三方摄像机
+10.58.122.119
+密码：admin
+用户名：admin
+
+puppy摄像机
+10.58.122.114/115
+密码：admin
+用户名：123456
+
+ftpimg配置
+/data/homey2.2_190730/run_env/binary/FtpImage root 1qaz3edc /data/ftp
+docker stop homey2.2_FtpImage
+docker start homey2.2_FtpImage
+
+puppy摄像机的ftp用户配置
+10.58.122.238:21 ftppuppy 123456   /data/ftp/ftppuppy
+
+第三方摄像机的ftp用户配置
+10.58.122.238:21 ftpthird 123456   /data/ftp/ftpthird  
+
+
+ls -l | grep "^-" | wc -l

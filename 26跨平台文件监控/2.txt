@@ -1,1 +1,7 @@
-1
+https://github.com/radovskyb/watcher699
+
+https://github.com/howeyc/fsnotify/tree/master  1865 
+
+https://github.com/fsnotify/fsnotify 3670
+fsnotify是 howeyc/fsnotify 的一个分支，在v1.0版本中提供了一个新的API。
+必须对每个文件夹添加监控器
