@@ -3,7 +3,7 @@
 # google.golang.org/genproto
 # google.golang.org/grpc
 # github.com/jinzhu/gorm                  100000
-# github.com/go-sql-driver/mysql  7000
+# github.com/go-sql-driver/mysql  7000 
 # github.com/siddontang/go-mysql 1670 强大的mysql工具集与Go 作为工具操作数据？
 # github.com/sirupsen/logrus          10000   日志
 # //go.uber.org/atomic
