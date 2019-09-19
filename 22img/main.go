@@ -7,16 +7,17 @@ import (
 	"fmt"
 	"image"
 	_ "image/gif"
-	_ "image/jpeg"
+	"image/jpeg"
 	_ "image/png"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"bytes"
 )
 
-func main() {
+func main2() {
 	tmpfile := "test.jpg"
 	os.Remove(tmpfile)
 	content, err := base64.StdEncoding.DecodeString(img1)
@@ -74,15 +75,40 @@ func GetOnlineImage() {
 	f.Close()
 }
 
-var filePth = "./2.jpg"
+var filePth = "./123.jpg"
 
-func main2() {
+func main() {
 	f, err := os.Open(filePth)
 	if err != nil {
 		fmt.Println("err1:", err)
 		return
 	}
 
+	// c, _, err = image.DecodeConfig(f)
+	// if err != nil {
+	// 	fmt.Println("SetCellHeight err  :", err)
+	// 	return
+	// }
+	// return
+
+	// img, err := jpeg.Decode(f)
+	// if err != nil {
+	// 	fmt.Println("err2:", err)
+	// 	return
+	// }
+
+	// filesave, err := os.Create("./a.jpeg")
+	// if err != nil {
+	// 	fmt.Println("Create File1 file err:", err)
+	// 	return
+	// }
+
+	// err = jpeg.Encode(filesave, img, &jpeg.Options{Quality: 100})
+	// if err != nil {
+	// 	fmt.Println("err2:", err)
+	// 	return
+	// }
+	// return
 	content, err := ioutil.ReadAll(f)
 	if err != nil {
 		fmt.Println("err2:", err)
@@ -90,7 +116,30 @@ func main2() {
 	}
 	CreateFile("./a.jpeg", content)
 }
-func CreateFile(filename string, content []byte) {
+func CreateFile(filename string, content []byte) error{
+	//创建文件
+	filesave, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Create File1 file err:", err)
+		return err
+	}
+	defer filesave.Close()
+
+
+	img, err := jpeg.Decode(bytes.NewReader(content))
+	if err != nil {
+		fmt.Println("err2:", err)
+		return err
+	}
+
+	err = jpeg.Encode(filesave, img, &jpeg.Options{Quality: 100})
+	if err != nil {
+		fmt.Println("err2:", err)
+		return err
+	}
+	return nil
+}
+func CreateFile2(filename string, content []byte) {
 	//创建文件
 	file, err := os.Create(filename)
 	if err != nil {
