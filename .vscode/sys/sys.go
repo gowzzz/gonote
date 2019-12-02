@@ -1,46 +1,39 @@
-package operation
+package main
 
 import (
-	"encoding/json"
+	"bufio"
+	"bytes"
 	"fmt"
-	"operationmanage/operation/config"
+	"github.com/shirou/gopsutil/cpu"
+	"github.com/shirou/gopsutil/disk"
+	"github.com/shirou/gopsutil/mem"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/shirou/gopsutil/cpu"
-	"github.com/shirou/gopsutil/disk"
-	"github.com/shirou/gopsutil/mem"
-
 	// "operationmanage/operation" //顺便初始化配置文件
 	"os/exec"
 )
 
-func GetSysInfo() (gpuInfo, memoryInfo, cpusInfo, diskInfo []byte, errCode int, errMsg string) {
-	gpu, err := GetGpuInfo()
-	if err != nil {
-		return nil, nil, nil, nil, ERROR_OPT_SERVER, GetMsg(ERROR_OPT_SERVER)
+//
+func splitByLine(in []byte) ([]string, error) {
+	buf := bufio.NewReader(bytes.NewReader(in))
+	var lines []string
+	for {
+		line, err := buf.ReadString('\n')
+		line = strings.TrimSpace(line)
+		if err != nil && err != io.EOF {
+			fmt.Println("err2:", err)
+			return nil, err
+		}
+		lines = append(lines, line)
+		if err == io.EOF { //读取结束，会报EOF
+			fmt.Println("eof")
+			break
+		}
 	}
-	gpuInfo, err = json.Marshal(gpu)
-	if err != nil {
-		return nil, nil, nil, nil, ERROR_OPT_SERVER, GetMsg(ERROR_OPT_GPU_JSON)
-	}
-	memory, cpus, disk := SysInfo()
-	memoryInfo, err = json.Marshal(memory)
-	if err != nil {
-		return nil, nil, nil, nil, ERROR_OPT_SERVER, GetMsg(ERROR_OPT_MEM_JSON)
-	}
-	cpusInfo, err = json.Marshal(cpus)
-	if err != nil {
-		return nil, nil, nil, nil, ERROR_OPT_SERVER, GetMsg(ERROR_OPT_CPU_JSON)
-	}
-	diskInfo, err = json.Marshal(disk)
-	if err != nil {
-		return nil, nil, nil, nil, ERROR_OPT_SERVER, GetMsg(ERROR_OPT_DISK_JSON)
-	}
-
-	return
+	return lines, nil
 }
 
 type GpuInfo struct {
@@ -51,21 +44,21 @@ type GpuInfo struct {
 }
 type GpuInfos []GpuInfo
 
-func GetGpuInfo() (GpuInfos, error) {
+func GetGpuInfo() {
 	// 先获取gpu数量，再
 	cmdOutput, err := exec.Command("/bin/bash", "-c", "nvidia-smi -L").Output()
 	if err != nil {
 		fmt.Println("cmd err:", err)
-		return nil, err
+		return
 	}
 	lines, err := splitByLine(cmdOutput)
 	if err != nil {
 		fmt.Println("splitByLine err:", err)
-		return nil, err
+		return
 	}
 	var gpuInfos GpuInfos
 	for _, line := range lines {
-		var gpuInfo = GpuInfo{Threshold: config.GetConf().Services.Common.GpuThreshold}
+		var gpuInfo = GpuInfo{}
 		splitNOutput := strings.SplitN(line, ":", 2) //GPU 0 |rest
 		if len(splitNOutput) == 0 {
 			break
@@ -80,7 +73,7 @@ func GetGpuInfo() (GpuInfos, error) {
 			fmt.Println("Num Atoi err:", err)
 			break
 		}
-		cmdstr := "nvidia-smi -d UTILIZATION -q -i " + splitOutput[1]
+		cmdstr := "nvidia-smi -d MEMORY -q -i " + splitOutput[1]
 		cmdOutput, err := exec.Command("/bin/bash", "-c", cmdstr).Output()
 		if err != nil {
 			fmt.Println("cmd2 err:", err)
@@ -92,23 +85,23 @@ func GetGpuInfo() (GpuInfos, error) {
 			fmt.Println("SplitByLine2 err:", err)
 			break
 		}
-		for _, line := range lines {
+		for i := 0; i < len(lines); i++ {
+			line := lines[i]
 			fmt.Println("line:", line)
-			if strings.Contains(line, "Gpu") {
-				resp := regexp.MustCompile("[0-9]+").FindString(line)
-				fmt.Println("resp:", resp)
-				if len(resp) > 0 {
-					gpuInfo.Used, err = strconv.Atoi(resp)
-					if err != nil {
-						fmt.Println("err:", err)
-						break
-					}
-				}
+			if strings.Contains(line, "FB Memory Usage") {
+				total := regexp.MustCompile("[0-9]+").FindString(lines[i+1])
+				used := regexp.MustCompile("[0-9]+").FindString(lines[i+2])
+				free := regexp.MustCompile("[0-9]+").FindString(lines[i+3])
+				fmt.Println("total:", total)
+				fmt.Println("used:", used)
+				fmt.Println("free:", free)
+				break
+
 			}
 		}
 		gpuInfos = append(gpuInfos, gpuInfo)
 	}
-	return gpuInfos, nil
+	return
 }
 
 type SysUseInfo struct {
@@ -119,55 +112,39 @@ type SysUseInfo struct {
 	Threshold int
 }
 
-func SysInfo() (*SysUseInfo, []SysUseInfo, *SysUseInfo) {
+func SysInfo() {
 	v, _ := mem.VirtualMemory()
 	fmt.Printf("        Mem       : %v MB  Free: %v MB Used:%v Usage:%f%%\n", v.Total/1024/1024, v.Available/1024/1024, v.Used/1024/1024, v.UsedPercent)
-	var memoryInfo = &SysUseInfo{
-		Totol:     v.Total / 1024 / 1024,
-		Free:      v.Available / 1024 / 1024,
-		Used:      v.Used / 1024 / 1024,
-		Usage:     v.UsedPercent,
-		Threshold: config.GetConf().Services.Common.MemoryThreshold,
-	}
+
 	// c, _ := cpu.Info()
 	cc, _ := cpu.Percent(time.Second, false)
 	fmt.Printf("        CPU:  %f\n", cc)
 	var cpuInfos []SysUseInfo
 	for _, c := range cc {
 		cpuInfos = append(cpuInfos, SysUseInfo{
-			Usage:     c,
-			Threshold: config.GetConf().Services.Common.CpuThreshold,
+			Usage: c,
 		})
 	}
 	// fmt.Printf("        CPU Used    : used %f%% \n", cc[0])
-	d, _ := disk.Usage("/")
-	fmt.Printf("        HD        : %v GB  Free: %v GB Usage:%f%%\n", d.Total/1024/1024/1024, d.Free/1024/1024/1024, d.UsedPercent)
-	var diskInfo = &SysUseInfo{
-		Totol:     d.Total / 1024 / 1024,
-		Free:      d.Free / 1024 / 1024,
-		Used:      d.Used / 1024 / 1024,
-		Usage:     d.UsedPercent,
-		Threshold: config.GetConf().Services.Common.DiskThreshold,
+	// d, _ := disk.Usage("/")
+	// fmt.Printf("        HD        : %v GB  Free: %v GB Usage:%f%%\n", d.Total/1024/1024/1024, d.Free/1024/1024/1024, d.UsedPercent)
+	dps, _ := disk.Partitions(true)
+	for k, v := range dps {
+		fmt.Printf("        Disk num:  %d  name:  %s\n", k, v.Mountpoint)
+		d, err := disk.Usage(v.Mountpoint)
+		if err != nil {
+			fmt.Println(v.Mountpoint+" err:", err)
+			continue
+		}
+		fmt.Printf("        HD        : %v GB  Free: %v GB Usage:%f%%\n", d.Total/1024/1024/1024, d.Free/1024/1024/1024, d.UsedPercent)
+
 	}
-	return memoryInfo, cpuInfos, diskInfo
-	// n, _ := host.Info()
-	// nv, _ := net.IOCounters(true)
-	// boottime, _ := host.BootTime()
-	// btime := time.Unix(int64(boottime), 0).Format("2006-01-02 15:04:05")
-	// if len(c) > 1 {
-	// 	for _, sub_cpu := range c {
-	// 		modelname := sub_cpu.ModelName
-	// 		cores := sub_cpu.Cores
-	// 		fmt.Printf("        CPU       : %v   %v cores \n", modelname, cores)
-	// 	}
-	// } else {
-	// 	sub_cpu := c[0]
-	// 	modelname := sub_cpu.ModelName
-	// 	cores := sub_cpu.Cores
-	// 	fmt.Printf("        CPU       : %v   %v cores \n", modelname, cores)
-	// }
-	// fmt.Printf("        Network: %v bytes / %v bytes\n", nv[0].BytesRecv, nv[0].BytesSent)
-	// fmt.Printf("        SystemBoot:%v\n", btime)
-	// fmt.Printf("        OS        : %v(%v)   %v  \n", n.Platform, n.PlatformFamily, n.PlatformVersion)
-	// fmt.Printf("        Hostname  : %v  \n", n.Hostname)
+	return
+
+}
+
+// CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
+func main() {
+	GetGpuInfo()
+	SysInfo()
 }
