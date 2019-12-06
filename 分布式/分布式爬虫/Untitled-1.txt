@@ -1,0 +1,9 @@
+golang字符编码的转换
+抓取链家网数据时，网页本身是utf8编码，没有问题，可是抓取房天下的数据时，网页本身是gb2312，折腾了好一会， F**K
+
+//src为要转换的字符串
+func coverGBKToUTF8(src string) string {
+    // 网上搜有说要调用translate函数的，实测不用
+    return mahonia.NewDecoder("gbk").ConvertString(src)
+}
+"github.com/axgle/mahonia"
